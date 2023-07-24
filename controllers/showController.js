@@ -75,22 +75,24 @@ const deleteShow = AsyncHandler(async (req, res) => {
 
 const getAllShows = AsyncHandler(async (req, res) => {
   try {
-    const AllShows = await Show.find({});
+    const AllAscShows = await Show.find({}).sort({ date: 1 });
+    const AllDescShows = await Show.find({}).sort({ date: -1 });
 
-    if (!AllShows) throw new Error("You have not created any shows");
-     
-    const completedShows = AllShows.map((show) => {
+    if (!AllAscShows) throw new Error("You have not created any shows");
+
+    const completedShows = [];
+    const pendingShows = [];
+
+    AllDescShows.map((show) => {
       if (show.isPast) {
-        return show;
+        completedShows.push(show);
       }
-      return;
     });
 
-    const pendingShows = AllShows.map((show) => {
-      if (show.isPast) {
-        return;
+    AllAscShows.map((show) => {
+      if (!show.isPast) {
+        pendingShows.push(show);
       }
-      return show;
     });
 
     return res.status(200).json({
