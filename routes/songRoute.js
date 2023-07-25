@@ -1,5 +1,5 @@
 const express = require("express")
-const { createSong, updateSong, deleteSong, getSong, getAllSongs, uploadCoverArt } = require("../controllers/songController")
+const { createSong, updateSong, deleteSong, getSong, getAllSongs, uploadCoverArt, getRecentSong } = require("../controllers/songController")
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware")
 const { uploadPhoto } = require("../middlewares/uploadImage")
 
@@ -15,6 +15,8 @@ songRouter.route("/update/:id").put(authMiddleware, isAdmin, updateSong)
 songRouter.route("/delete/:id").delete(authMiddleware, isAdmin, deleteSong)
 
 songRouter.route("/:id").get(getSong)
+
+songRouter.route("/recent").get(getRecentSong)
 
 songRouter.route("/").get(getAllSongs)
 

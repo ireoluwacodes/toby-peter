@@ -10,6 +10,10 @@ var songSchema = new mongoose.Schema({
     type: String,
   },
   streamingLink: {},
+  releaseDate: {
+    type: Date,
+    required: true,
+  },
 });
 
 //Export the model

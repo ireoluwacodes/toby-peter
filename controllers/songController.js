@@ -1,16 +1,17 @@
 const AsyncHandler = require("express-async-handler");
-
 const { Song } = require("../models/songModel");
 const { cloudinaryUpload } = require("../utils/cloudinaryConfig");
 const fs = require("fs");
 
 const createSong = AsyncHandler(async (req, res) => {
-  const { title, streamingLink } = req.body;
-  if (!title && !streamingLink) throw new Error("Please enter All fields");
+  const { title, streamingLink, releaseDate } = req.body;
+  if ((!title && !streamingLink) || !releaseDate)
+    throw new Error("Please enter All fields");
   try {
     const newSong = await Song.create({
       title,
       streamingLink,
+      releaseDate,
     });
 
     return res.status(200).json({
@@ -30,7 +31,7 @@ const uploadCoverArt = AsyncHandler(async (req, res) => {
     const uploader = (path) => cloudinaryUpload(path, "image");
     const file = req.file;
     const { path } = file;
-    const {url} = await uploader(path);
+    const { url } = await uploader(path);
     fs.unlinkSync(path);
 
     const updatedSong = await Song.findByIdAndUpdate(
@@ -58,8 +59,9 @@ const updateSong = AsyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) throw new Error("Invalid Parameters");
   try {
-    const { title, streamingLink } = req.body;
-    if (!title && !streamingLink) throw new Error("Nothing to update");
+    const { title, streamingLink, releaseDate } = req.body;
+    if (!title && !streamingLink && !releaseDate)
+      throw new Error("Nothing to update");
 
     const updatedSong = await Song.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -123,6 +125,21 @@ const getAllSongs = AsyncHandler(async (req, res) => {
   }
 });
 
+const getRecentSong = AsyncHandler(async (req, res) => {
+  try {
+    const allSongs = await Song.find({}).sort({ releaseDate: -1 });
+
+    if (!allSongs) throw new Error("No song to display");
+
+    return res.status(200).json({
+      status: "success",
+      recentSong: allSongs[0],
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createSong,
   uploadCoverArt,
@@ -130,4 +147,5 @@ module.exports = {
   deleteSong,
   getSong,
   getAllSongs,
+  getRecentSong,
 };
