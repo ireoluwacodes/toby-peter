@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   refreshToken: {
     type: String,
+    default: " ",
   },
   isAdmin: {
     type: Boolean,

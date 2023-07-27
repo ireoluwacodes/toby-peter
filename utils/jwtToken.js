@@ -8,13 +8,27 @@ try {
         id
     }
     const token =  jwt.sign(payload, secret, {
-        expiresIn : "2 days"
+        expiresIn : "1 day"
     })
     return token
 } catch (error) {
     throw new Error(error)
 }
 }
+
+const signRefreshToken = async (id)=>{
+    try {
+        const payload = {
+            id
+        }
+        const token =  jwt.sign(payload, secret, {
+            expiresIn : "3 days"
+        })
+        return token
+    } catch (error) {
+        throw new Error(error)
+    }
+    }
 
 const verifyToken = async (token)=>{
 try {
@@ -26,5 +40,5 @@ return payload.id
 }
 
 module.exports = {
-    signToken, verifyToken
+    signToken, verifyToken, signRefreshToken
 }

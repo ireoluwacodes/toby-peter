@@ -3,8 +3,8 @@ const { Show } = require("../models/showModel");
 
 const createShow = AsyncHandler(async (req, res) => {
   const { title, venue, date, ticketLink } = req.body;
-  if (!title || !venue || !date || !ticketLink)
-    throw new Error("please enter all fields");
+  if (!title || !venue || !date || !ticketLink){ res.status(401)
+    throw new Error("please enter all fields");}
   try {
     const newShow = await Show.create({
       title,
@@ -25,11 +25,13 @@ const createShow = AsyncHandler(async (req, res) => {
 
 const completeShow = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("invalid parameters");
+  if (!id) { res.status(403)
+    throw new Error("invalid parameters");}
   try {
     const findShow = await Show.findById(id);
-    if (!findShow) throw new Error("show not Found");
-
+    if (!findShow) { res.status(404)
+      throw new Error("show not Found");
+    }
     findShow.isPast = true;
     await findShow.save();
 
@@ -44,11 +46,13 @@ const completeShow = AsyncHandler(async (req, res) => {
 
 const getShow = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("invalid parameters");
+  if (!id) { res.status(403)
+    throw new Error("invalid parameters");}
   try {
     const findShow = await Show.findById(id);
-    if (!findShow) throw new Error("show not Found");
-
+    if (!findShow) { res.status(404)
+      throw new Error("show not Found");}
+   
     return res.status(200).json({
       status: "success",
       show: findShow,
@@ -60,7 +64,8 @@ const getShow = AsyncHandler(async (req, res) => {
 
 const deleteShow = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("invalid parameters");
+  if (!id){ res.status(403)
+     throw new Error("invalid parameters");}
   try {
     const deletedShow = await Show.findByIdAndDelete(id);
 
@@ -78,7 +83,8 @@ const getAllShows = AsyncHandler(async (req, res) => {
     const AllAscShows = await Show.find({}).sort({ date: 1 });
     const AllDescShows = await Show.find({}).sort({ date: -1 });
 
-    if (!AllAscShows) throw new Error("You have not created any shows");
+    if (!AllAscShows) { res.status(206) 
+      throw new Error("You have not created any shows");}
 
     const completedShows = [];
     const pendingShows = [];

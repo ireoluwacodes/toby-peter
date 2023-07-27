@@ -8,10 +8,16 @@ const {
 
 const createSubscriber = AsyncHandler(async (req, res) => {
   const { email } = req.body;
-  if (!email) throw new Error("Please enter all fields");
+  if (!email) {
+    res.status(401);
+    throw new Error("Please enter all fields");
+  }
   try {
     const findSub = await Subscriber.findOne({ email });
-    if (findSub) throw new Error("You are already subscribed");
+    if (findSub) {
+      res.status(403);
+      throw new Error("You are already subscribed");
+    }
 
     // const addData = {
     //   members: [
@@ -22,7 +28,7 @@ const createSubscriber = AsyncHandler(async (req, res) => {
     //     },
     //   ],
     // };
-  
+
     // const dataJson = JSON.stringify(addData);
 
     // const options = {
@@ -33,7 +39,7 @@ const createSubscriber = AsyncHandler(async (req, res) => {
     //   },
     //   body: dataJson,
     // };
-     
+
     // const makeRequest = async (options)=>{
     //   request(options, (error, response, body) => {
     //     if (error) {
@@ -43,7 +49,7 @@ const createSubscriber = AsyncHandler(async (req, res) => {
     //     }
     //   });
     // }
-     await addToMailList(email)
+    await addToMailList(email);
     // await makeRequest(options)
 
     const newSub = await Subscriber.create({
@@ -61,12 +67,18 @@ const createSubscriber = AsyncHandler(async (req, res) => {
 
 const deleteSubscriber = AsyncHandler(async (req, res) => {
   const { email } = req.body;
-  if (!email) throw new Error("Please enter all fields");
+  if (!email) {
+    res.status(401);
+    throw new Error("Please enter all fields");
+  }
   try {
     const deletedSub = await Subscriber.findOneAndDelete({ email });
-    if (!deletedSub) throw new Error("You are already unsubscribed");
+    if (!deletedSub) {
+      res.status(403);
+      throw new Error("You are already unsubscribed");
+    }
 
-  await deleteFromMailList(email);
+    await deleteFromMailList(email);
 
     return res.status(200).json({
       status: "success",
@@ -80,7 +92,10 @@ const deleteSubscriber = AsyncHandler(async (req, res) => {
 const getAllSubscribers = AsyncHandler(async (req, res) => {
   try {
     const allSubscribers = await Subscriber.find({});
-    if (!allSubscribers) throw new Error("You have no subscribers");
+    if (!allSubscribers) {
+      res.status(206);
+      throw new Error("You have no subscribers");
+    }
 
     return res.status(200).json({
       status: "success",

@@ -5,8 +5,10 @@ const fs = require("fs");
 
 const createSong = AsyncHandler(async (req, res) => {
   const { title, streamingLink, releaseDate } = req.body;
-  if ((!title && !streamingLink) || !releaseDate)
+  if ((!title && !streamingLink) || !releaseDate) {
+    res.status(401);
     throw new Error("Please enter All fields");
+  }
   try {
     const newSong = await Song.create({
       title,
@@ -26,7 +28,10 @@ const createSong = AsyncHandler(async (req, res) => {
 
 const uploadCoverArt = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("Invalid Parameters");
+  if (!id) {
+    res.status(403);
+    throw new Error("Invalid Parameters");
+  }
   try {
     const uploader = (path) => cloudinaryUpload(path, "image");
     const file = req.file;
@@ -43,7 +48,10 @@ const uploadCoverArt = AsyncHandler(async (req, res) => {
         new: true,
       }
     );
-    if (!updatedSong) throw new Error("song not found");
+    if (!updatedSong) {
+      res.status(404);
+      throw new Error("song not found");
+    }
 
     return res.status(200).json({
       status: "success",
@@ -57,16 +65,24 @@ const uploadCoverArt = AsyncHandler(async (req, res) => {
 
 const updateSong = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("Invalid Parameters");
+  if (!id) {
+    res.status(403);
+    throw new Error("Invalid Parameters");
+  }
   try {
     const { title, streamingLink, releaseDate } = req.body;
-    if (!title && !streamingLink && !releaseDate)
+    if (!title && !streamingLink && !releaseDate) {
+      res.status(401);
       throw new Error("Nothing to update");
+    }
 
     const updatedSong = await Song.findByIdAndUpdate(id, req.body, {
       new: true,
     });
-    if (!updatedSong) throw new Error("Song not Found");
+    if (!updatedSong) {
+      res.status(404);
+      throw new Error("Song not Found");
+    }
 
     return res.status(200).json({
       status: "success",
@@ -79,11 +95,17 @@ const updateSong = AsyncHandler(async (req, res) => {
 
 const deleteSong = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("Invalid Parameters");
+  if (!id) {
+    res.status(403);
+    throw new Error("Invalid Parameters");
+  }
   try {
     const deletedSong = await Song.findByIdAndDelete(id);
 
-    if (!deletedSong) throw new Error("Song already deleted");
+    if (!deletedSong) {
+      res.status(404);
+      throw new Error("Song already deleted");
+    }
 
     return res.status(200).json({
       status: "success",
@@ -96,11 +118,17 @@ const deleteSong = AsyncHandler(async (req, res) => {
 
 const getSong = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!id) throw new Error("Invalid Parameters");
+  if (!id) {
+    res.status(403);
+    throw new Error("Invalid Parameters");
+  }
   try {
     const getSong = await Song.findById(id);
 
-    if (!getSong) throw new Error("Song not Found");
+    if (!getSong) {
+      res.status(404);
+      throw new Error("Song not Found");
+    }
 
     return res.status(200).json({
       status: "success",
@@ -114,7 +142,10 @@ const getSong = AsyncHandler(async (req, res) => {
 const getAllSongs = AsyncHandler(async (req, res) => {
   try {
     const allSongs = await Song.find({});
-    if (!allSongs) throw new Error("No song to display");
+    if (!allSongs) {
+      res.status(206);
+      throw new Error("No song to display");
+    }
 
     return res.status(200).json({
       status: "success",
@@ -129,7 +160,10 @@ const getRecentSong = AsyncHandler(async (req, res) => {
   try {
     const allSongs = await Song.find({}).sort({ releaseDate: -1 });
 
-    if (!allSongs) throw new Error("No song to display");
+    if (!allSongs) {
+      res.status(206);
+      throw new Error("No song to display");
+    }
 
     return res.status(200).json({
       status: "success",

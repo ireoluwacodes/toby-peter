@@ -1,21 +1,30 @@
 const AsyncHandler = require("express-async-handler");
-
 const { User } = require("../models/userModel");
 const { hashPassword, comparePassword } = require("../utils/cryptPassword");
-const { signToken } = require("../utils/jwtToken");
+const {
+  signToken,
+  signRefreshToken,
+  verifyToken,
+} = require("../utils/jwtToken");
 const { transporter, mailOptions } = require("../utils/mailer");
 const { Subscriber } = require("../models/subscriberModel");
 
 const registerAuth = AsyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) throw new Error("Please enter all fields");
+  if (!email || !password) {
+    res.status(401);
+    throw new Error("Please enter all fields");
+  }
   try {
     const find = await User.find({});
 
-    if (find.length == 1) throw new Error("Admin user Already exists");
+    if (find.length == 1) {
+      res.status(403);
+      throw new Error("Admin user Already exists");
+    }
 
     const hash = await hashPassword(password);
-    
+
     const newAdmin = await User.create({
       email,
       hash,
@@ -32,31 +41,43 @@ const registerAuth = AsyncHandler(async (req, res) => {
 
 const loginAuth = AsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) throw new Error("Please enter all fields");
+  if (!email || !password) {
+    res.status(401);
+    throw new Error("Please enter all fields");
+  }
   try {
     const findUser = await User.findOne({ email });
-    if (!findUser) throw new Error("User not Found");
-    if (!findUser.isAdmin) throw new Error("User is not an Admin");
+    if (!findUser) {
+      res.status(404);
+      throw new Error("User not Found");
+    }
+    if (!findUser.isAdmin) {
+      res.status(403);
+      throw new Error("User is not an Admin");
+    }
 
     const validate = await comparePassword(password, findUser.hash);
-    if (!validate) throw new Error("Invalid Credentials");
+    if (!validate) {
+      res.status(401);
+      throw new Error("Invalid Credentials");
+    }
 
-    // const refreshToken = signToken(findUser._id);
+    const refreshToken = await signRefreshToken(findUser._id);
 
-    // await User.findByIdAndUpdate(
-    //   findUser._id,
-    //   {
-    //     refreshToken,
-    //   },
-    //   {
-    //     new: true,
-    //   }
-    // );
+    await User.findByIdAndUpdate(
+      findUser._id,
+      {
+        refreshToken,
+      },
+      {
+        new: true,
+      }
+    );
 
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   maxAge: 72 * 60 * 60 * 1000,
-    // });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,
+    });
 
     const token = await signToken(findUser._id);
 
@@ -71,17 +92,54 @@ const loginAuth = AsyncHandler(async (req, res, next) => {
   }
 });
 
+const refresh = AsyncHandler(async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      res.status(401);
+      throw new Error("No refresh token in cookie");
+    }
+
+    const findUser = await User.findOne({ refreshToken });
+    if (!findUser) {
+      res.status(404);
+      throw new Error("User with refresh token not found");
+    }
+
+    const id = await verifyToken(refreshToken);
+    if (id != findUser._id) {
+      res.status(403);
+      throw new Error("Could not verify refresh token");
+    }
+
+    const token = await signToken(findUser._id);
+
+    return res.status(200).json({
+      status: "success",
+      token,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const forgotPassword = AsyncHandler(async (req, res) => {
   const { email } = req.body;
-  if (!email) throw new Error("Please enter all fields");
+  if (!email) {
+    res.status(401);
+    throw new Error("Please enter all fields");
+  }
   try {
     const findUser = await User.findOne({ email });
-    if (!findUser) throw new Error("User not Found");
+    if (!findUser) {
+      res.status(404);
+      throw new Error("User not Found");
+    }
 
     const tempPassword = Math.round(Math.random() * 1e7);
-  
+
     const hash = await hashPassword(`${tempPassword}`);
-   
+
     findUser.hash = hash;
 
     // send temporary password to mail
@@ -104,30 +162,75 @@ const forgotPassword = AsyncHandler(async (req, res) => {
   }
 });
 
-const changePassword = AsyncHandler(async (req,res)=>{
-    const {id} = req.user
-    if(!id) throw new Error("Unauthorized")
-    try {
-        const {password} = req.body
-        if (!password) throw new Error("Enter all fields")
-
-        const findUser = await User.findById(id)
-        if(!findUser) throw new Error("User not Found")
-
-        const hash = await hashPassword(password)
-        findUser.hash = hash
-
-        await findUser.save()
-
-        return res.status(200).json({
-            status : "success",
-            message : "Password updated Successfully"
-        })
-    } catch (error) {
-        throw new Error(error)
+const changePassword = AsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  if (!id) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  try {
+    const { password } = req.body;
+    if (!password) {
+      res.status(401);
+      throw new Error("Enter all fields");
     }
-})
- 
+
+    const findUser = await User.findById(id);
+    if (!findUser) {
+      res.status(404);
+      throw new Error("User not Found");
+    }
+
+    const hash = await hashPassword(password);
+    findUser.hash = hash;
+
+    await findUser.save();
+
+    return res.status(200).json({
+      status: "success",
+      message: "Password updated Successfully",
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const logoutAuth = AsyncHandler(async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      res.status(403);
+      throw new Error("No refresh token in cookie");
+    }
+    const findUser = await User.findOne({ refreshToken });
+    if (!findUser) {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+      });
+      return res.sendStatus(403);
+    }
+
+    await User.findByIdAndUpdate(
+      findUser._id,
+      {
+        refreshToken: " ",
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return res.sendStatus(204);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 // const sendNewsletter = AsyncHandler(async(req,res)=>{
 //    const {subject, message} = req.body
 //    if(!subject || !message) throw new Error("Please enter all fields")
@@ -137,7 +240,7 @@ const changePassword = AsyncHandler(async (req,res)=>{
 //     const allSubMail = Subscribers.map((item)=>{
 //       return item.email
 //     })
-   
+
 //    } catch (error) {
 //     throw new Error(error)
 //    }
@@ -148,5 +251,7 @@ module.exports = {
   loginAuth,
   forgotPassword,
   changePassword,
+  refresh,
+  logoutAuth,
   // sendNewsletter
 };
