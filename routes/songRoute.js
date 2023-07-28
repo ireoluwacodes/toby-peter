@@ -14,9 +14,9 @@ songRouter.route("/update/:id").put(authMiddleware, isAdmin, updateSong)
 
 songRouter.route("/delete/:id").delete(authMiddleware, isAdmin, deleteSong)
 
-songRouter.route("/:id").get(getSong)
-
 songRouter.route("/recent").get(getRecentSong)
+
+songRouter.route("/:id").get(getSong)
 
 songRouter.route("/").get(getAllSongs)
 
