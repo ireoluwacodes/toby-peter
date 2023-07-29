@@ -6,9 +6,9 @@ const { uploadPhoto } = require("../middlewares/uploadImage")
 const songRouter = express.Router()
 
 
-songRouter.route("/create").post(authMiddleware, isAdmin, createSong)
+songRouter.route("/create").post(authMiddleware, isAdmin, uploadPhoto.single("image"), createSong)
 
-songRouter.route("/upload-cover/:id").put(authMiddleware, isAdmin, uploadPhoto.single("image"), uploadCoverArt)
+// songRouter.route("/upload-cover/:id").put(authMiddleware, isAdmin, uploadCoverArt)
 
 songRouter.route("/update/:id").put(authMiddleware, isAdmin, updateSong)
 

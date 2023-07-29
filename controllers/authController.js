@@ -231,6 +231,7 @@ const logoutAuth = AsyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
 // const sendNewsletter = AsyncHandler(async(req,res)=>{
 //    const {subject, message} = req.body
 //    if(!subject || !message) throw new Error("Please enter all fields")
