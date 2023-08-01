@@ -77,6 +77,7 @@ const loginAuth = AsyncHandler(async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
+      secure: true,
     });
 
     const token = await signToken(findUser._id);
