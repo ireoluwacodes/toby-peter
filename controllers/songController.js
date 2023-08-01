@@ -4,26 +4,25 @@ const { cloudinaryUpload } = require("../utils/cloudinaryConfig");
 const fs = require("fs");
 
 const createSong = AsyncHandler(async (req, res) => {
-  const { title, streamingLink, releaseDate } = req.body;
+  const { title, streamingLink, releaseDate, url } = req.body;
 
   // initialize for uploading cover art
-  const uploader = (path) => cloudinaryUpload(path, "image");
-  const file = req.file;
-  console.log({ title, streamingLink, releaseDate, file });
-  if (!title || !releaseDate || !file) {
+  // const uploader = (path) => cloudinaryUpload(path, "image");
+  // const file = req.file;
+  if (!title || !releaseDate || !url) {
     res.status(401);
     throw new Error("Please enter All fields");
   }
   try {
-    // upload the cover art first
-    const { path } = file;
-    const { url } = await uploader(path);
-    fs.unlinkSync(path);
+    // // upload the cover art first
+    // const { path } = file;
+    // const { url } = await uploader(path);
+    // fs.unlinkSync(path);
 
     const newSong = await Song.create({
       title,
       coverArt: url,
-      streamingLink: JSON.parse(streamingLink),
+      streamingLink,
       releaseDate,
     });
 
@@ -38,42 +37,23 @@ const createSong = AsyncHandler(async (req, res) => {
   }
 });
 
-// const uploadCoverArt = AsyncHandler(async (req, res) => {
-//   const { id } = req.params;
-//   if (!id) {
-//     res.status(403);
-//     throw new Error("Invalid Parameters");
-//   }
-//   try {
-//     const uploader = (path) => cloudinaryUpload(path, "image");
-//     const file = req.file;
-//     const { path } = file;
-//     const { url } = await uploader(path);
-//     fs.unlinkSync(path);
+const uploadCoverArt = AsyncHandler(async (req, res) => {
+  try {
+    const uploader = (path) => cloudinaryUpload(path, "image");
+    const file = req.file;
+    const { path } = file;
+    const { url } = await uploader(path);
+    fs.unlinkSync(path);
 
-//     const updatedSong = await Song.findByIdAndUpdate(
-//       id,
-//       {
-//         coverArt: url,
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     if (!updatedSong) {
-//       res.status(404);
-//       throw new Error("song not found");
-//     }
-
-//     return res.status(200).json({
-//       status: "success",
-//       message: "Uploaded!",
-//       url,
-//     });
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
+    return res.status(200).json({
+      status: "success",
+      message: "Uploaded!",
+      url,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 const updateSong = AsyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -188,7 +168,7 @@ const getRecentSong = AsyncHandler(async (req, res) => {
 
 module.exports = {
   createSong,
-  // uploadCoverArt,
+  uploadCoverArt,
   updateSong,
   deleteSong,
   getSong,
