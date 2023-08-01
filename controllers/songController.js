@@ -6,6 +6,7 @@ const fs = require("fs");
 const createSong = AsyncHandler(async (req, res) => {
   const { title, streamingLink, releaseDate } = req.body;
   // initialize for uploading cover art
+  console.log(req.body)
   const uploader = (path) => cloudinaryUpload(path, "image");
   const file = req.file;
 
