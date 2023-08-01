@@ -77,7 +77,7 @@ const loginAuth = AsyncHandler(async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
-      secure: false,
+      secure: true,
       sameSite: "none",
     });
 
@@ -225,7 +225,7 @@ const logoutAuth = AsyncHandler(async (req, res) => {
 
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "none",
     });
 
