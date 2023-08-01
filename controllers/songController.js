@@ -5,11 +5,11 @@ const fs = require("fs");
 
 const createSong = AsyncHandler(async (req, res) => {
   const { title, streamingLink, releaseDate } = req.body;
-  
+
   // initialize for uploading cover art
   const uploader = (path) => cloudinaryUpload(path, "image");
   const file = req.file;
-
+  console.log({ title, streamingLink, releaseDate, file });
   if (!title || !releaseDate || !file) {
     res.status(401);
     throw new Error("Please enter All fields");
