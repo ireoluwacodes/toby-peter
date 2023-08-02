@@ -26,28 +26,27 @@ const createShow = AsyncHandler(async (req, res) => {
 });
 
 const completeShow = AsyncHandler(async (req, res) => {
-  console.log(req.headers)
   const { id } = req.params;
-  // if (!id) {
-  //   res.status(403);
-  //   throw new Error("invalid parameters");
-  // }
-  // try {
-  //   const findShow = await Show.findById(id);
-  //   if (!findShow) {
-  //     res.status(404);
-  //     throw new Error("show not Found");
-  //   }
-  //   findShow.isPast = true;
-  //   await findShow.save();
+  if (!id) {
+    res.status(403);
+    throw new Error("invalid parameters");
+  }
+  try {
+    const findShow = await Show.findById(id);
+    if (!findShow) {
+      res.status(404);
+      throw new Error("show not Found");
+    }
+    findShow.isPast = true;
+    await findShow.save();
 
-  //   return res.status(200).json({
-  //     status: "success",
-  //     message: "Show Completed",
-  //   });
-  // } catch (error) {
-  //   throw new Error(error);
-  // }
+    return res.status(200).json({
+      status: "success",
+      message: "Show Completed",
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
 });
 
 const getShow = AsyncHandler(async (req, res) => {
@@ -73,7 +72,6 @@ const getShow = AsyncHandler(async (req, res) => {
 });
 
 const deleteShow = AsyncHandler(async (req, res) => {
-  console.log(req.headers)
   const { id } = req.params;
   if (!id) {
     res.status(403);
