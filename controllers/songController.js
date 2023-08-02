@@ -133,7 +133,7 @@ const getSong = AsyncHandler(async (req, res) => {
 
 const getAllSongs = AsyncHandler(async (req, res) => {
   try {
-    const allSongs = await Song.find({});
+    const allSongs = await Song.find({}).sort({ releaseDate: -1 });
     if (!allSongs) {
       res.status(206);
       throw new Error("No song to display");
