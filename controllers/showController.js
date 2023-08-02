@@ -74,6 +74,7 @@ const getShow = AsyncHandler(async (req, res) => {
 });
 
 const deleteShow = AsyncHandler(async (req, res) => {
+  console.log(req.headers)
   const { id } = req.params;
   if (!id) {
     res.status(403);
