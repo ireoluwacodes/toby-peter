@@ -6,7 +6,7 @@ const showRouter = express.Router()
 
 showRouter.route("/create").post(authMiddleware, isAdmin, createShow)
 
-showRouter.route("/complete/:id").put(authMiddleware, isAdmin, completeShow)
+showRouter.route("/complete/:id").put(completeShow)
 
 showRouter.route("/delete/:id").delete(authMiddleware, isAdmin, deleteShow)
 
