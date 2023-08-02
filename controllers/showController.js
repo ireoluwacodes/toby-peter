@@ -28,7 +28,6 @@ const createShow = AsyncHandler(async (req, res) => {
 const completeShow = AsyncHandler(async (req, res) => {
   console.log(req.headers)
   const { id } = req.params;
-  console.log(id)
   // if (!id) {
   //   res.status(403);
   //   throw new Error("invalid parameters");
