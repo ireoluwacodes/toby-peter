@@ -13,12 +13,13 @@ const { userRouter } = require("./routes/userRoute");
 const { subscriberRouter } = require("./routes/subscriberRoute");
 const { showRouter } = require("./routes/showRoute");
 const { songRouter } = require("./routes/songRoute");
+const { blogRouter } = require("./routes/blogRoute");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["https://tobipeter.netlify.app"],
+    origin: ["https://127.0.0.1:3000"],
     methods: ["POST, GET, PUT, DELETE"],
     credentials: true,
   })
@@ -37,6 +38,8 @@ app.use("/api/subscribe", subscriberRouter);
 app.use("/api/show", showRouter);
 
 app.use("/api/song", songRouter);
+
+app.use("/api/blog", blogRouter);
 
 app.use(notFound);
 app.use(errHandler);

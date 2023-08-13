@@ -7,6 +7,8 @@ const {
   verifyToken,
 } = require("../utils/jwtToken");
 const { transporter, mailOptions } = require("../utils/mailer");
+const { cloudinaryUpload } = require("../utils/cloudinaryConfig");
+const fs = require("fs");
 const { Subscriber } = require("../models/subscriberModel");
 
 const registerAuth = AsyncHandler(async (req, res) => {
@@ -250,6 +252,59 @@ const logoutAuth = AsyncHandler(async (req, res) => {
 //    }
 // })
 
+const uploadUserAlbum = AsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  if (!id) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  try {
+    const uploader = (path) => cloudinaryUpload(path, "images");
+    const urls = [];
+    const files = req.files;
+    for (const file of files) {
+      const { path } = file;
+      const newPath = await uploader(path);
+      urls.push(newPath);
+      fs.unlinkSync(path);
+    }
+
+    const findUser = await User.findByIdAndUpdate(
+      id,
+      {
+        album: urls.map((file) => {
+          return file;
+        }),
+      },
+      { new: true }
+    );
+
+    return res.status(201).json({
+      message: "success",
+      album: findUser.album,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAlbum = AsyncHandler(async (req, res) => {
+  try {
+    const find = await User.find({});
+    if (find.length < 1) {
+      return res.status(206).json({
+        message: "No content to display",
+      });
+    }
+    const album = find[0].album;
+    return res.status(200).json({
+      album,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   registerAuth,
   loginAuth,
@@ -257,5 +312,7 @@ module.exports = {
   changePassword,
   refresh,
   logoutAuth,
+  uploadUserAlbum,
+  getAlbum,
   // sendNewsletter
 };

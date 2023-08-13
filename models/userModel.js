@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  album: {
+    type: Array,
+  },
 });
 
 //Export the model
