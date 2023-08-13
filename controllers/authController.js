@@ -305,6 +305,40 @@ const getAlbum = AsyncHandler(async (req, res) => {
   }
 });
 
+const deleteImage = AsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  if (!id) {
+    res.status(401);
+    throw new Error("Unauthorized");
+  }
+  try {
+    const { url } = req.body;
+    if (!url) {
+      res.status(400);
+      throw new Error("No url in body");
+    }
+    const updatedAdmin = await User.findByIdAndUpdate(
+      id,
+      {
+        $pull: {
+          album: {
+            url,
+          },
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    return res.status(200).json({
+      status: "success",
+      album: updatedAdmin.album,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   registerAuth,
   loginAuth,
@@ -314,5 +348,6 @@ module.exports = {
   logoutAuth,
   uploadUserAlbum,
   getAlbum,
+  deleteImage,
   // sendNewsletter
 };
