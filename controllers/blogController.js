@@ -41,11 +41,7 @@ const deleteBlog = AsyncHandler(async (req, res) => {
 const getAllBlogs = AsyncHandler(async (req, res) => {
   try {
     const AllBlogs = await Blog.find({});
-    if (AllBlogs.length < 1) {
-      return res.status(206).json({
-        message: "Nothing to display",
-      });
-    }
+  
     return res.status(200).json({
       message: "success",
       AllBlogs,

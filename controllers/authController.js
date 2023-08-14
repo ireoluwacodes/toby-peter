@@ -291,11 +291,7 @@ const uploadUserAlbum = AsyncHandler(async (req, res) => {
 const getAlbum = AsyncHandler(async (req, res) => {
   try {
     const find = await User.find({});
-    if (find.length < 1) {
-      return res.status(206).json({
-        message: "No content to display",
-      });
-    }
+  
     const album = find[0].album;
     return res.status(200).json({
       album,
