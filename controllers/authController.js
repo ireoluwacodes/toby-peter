@@ -269,12 +269,11 @@ const uploadUserAlbum = AsyncHandler(async (req, res) => {
       fs.unlinkSync(path);
     }
 
+    const { album } = await User.findById(id);
     const findUser = await User.findByIdAndUpdate(
       id,
       {
-        album: urls.map((file) => {
-          return file;
-        }),
+        album: [...album, ...urls],
       },
       { new: true }
     );
@@ -291,7 +290,7 @@ const uploadUserAlbum = AsyncHandler(async (req, res) => {
 const getAlbum = AsyncHandler(async (req, res) => {
   try {
     const find = await User.find({});
-  
+
     const album = find[0].album;
     return res.status(200).json({
       album,
