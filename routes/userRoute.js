@@ -21,7 +21,7 @@ userRouter.route("/upload").post(authMiddleware, isAdmin, uploadPhoto.array("ima
 
 userRouter.route("/album").get(getAlbum)
 
-userRouter.route("/delete-slide").delete(authMiddleware, isAdmin, deleteImage)
+userRouter.route("/delete-slide").put(authMiddleware, isAdmin, deleteImage)
 
 // userRouter.route("/send-news").put(authMiddleware, isAdmin, sendNewsletter)
 
