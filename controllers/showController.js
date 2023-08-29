@@ -49,6 +49,32 @@ const completeShow = AsyncHandler(async (req, res) => {
   }
 });
 
+const updateShow = AsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(403);
+    throw new Error("invalid parameters");
+  }
+  try {
+    if (!title && !venue && !date && !ticketLink) {
+      res.status(401);
+      throw new Error("please enter all fields");
+    }
+    const findShow = await Show.findByIdAndUpdate(id, req.body, { new: true });
+    if (!findShow) {
+      res.status(404);
+      throw new Error("show not Found");
+    }
+
+    return res.status(200).json({
+      message: "Show updated",
+      show: findShow,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 const getShow = AsyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -130,4 +156,5 @@ module.exports = {
   deleteShow,
   getAllShows,
   getShow,
+  updateShow
 };
