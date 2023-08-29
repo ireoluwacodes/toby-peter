@@ -140,7 +140,7 @@ const forgotPassword = AsyncHandler(async (req, res) => {
       throw new Error("User not Found");
     }
 
-    const tempPassword = Math.round(Math.random() * 1e7);
+    const tempPassword = Math.round(Math.random() * 1e9);
 
     const hash = await hashPassword(`${tempPassword}`);
 
