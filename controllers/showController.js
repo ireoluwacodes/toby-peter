@@ -56,6 +56,7 @@ const updateShow = AsyncHandler(async (req, res) => {
     throw new Error("invalid parameters");
   }
   try {
+    const { title, venue, date, ticketLink } = req.body;
     if (!title && !venue && !date && !ticketLink) {
       res.status(401);
       throw new Error("please enter all fields");
