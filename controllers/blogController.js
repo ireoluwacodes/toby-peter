@@ -55,7 +55,7 @@ const updateBlog = AsyncHandler(async (req, res) => {
     });
     return res.status(200).json({
       message: "Blog updated",
-      blog : updateBlog
+      blog: updateBlog,
     });
   } catch (error) {
     throw new Error(error);
@@ -64,7 +64,7 @@ const updateBlog = AsyncHandler(async (req, res) => {
 
 const getAllBlogs = AsyncHandler(async (req, res) => {
   try {
-    const AllBlogs = await Blog.find({}).sort({"createdAt" : -1});
+    const AllBlogs = await Blog.find({}).sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: "success",
@@ -75,9 +75,28 @@ const getAllBlogs = AsyncHandler(async (req, res) => {
   }
 });
 
+const getBlog = AsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(401);
+    throw new Error("invalid parameters");
+  }
+  try {
+    const blog = await Blog.findById(id);
+
+    return res.status(200).json({
+      message: "success",
+      blog,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createBlog,
   deleteBlog,
   getAllBlogs,
-  updateBlog
+  getBlog,
+  updateBlog,
 };

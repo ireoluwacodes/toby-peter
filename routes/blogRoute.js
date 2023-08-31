@@ -4,10 +4,13 @@ const {
   createBlog,
   deleteBlog,
   updateBlog,
+  getBlog,
 } = require("../controllers/blogController");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 const blogRouter = express.Router();
+
+blogRouter.route("/:id").get(getBlog);
 
 blogRouter.route("/").get(getAllBlogs);
 
