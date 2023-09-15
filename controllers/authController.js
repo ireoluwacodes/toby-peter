@@ -153,7 +153,7 @@ const forgotPassword = AsyncHandler(async (req, res) => {
     let mailOption = mailOptions(email, "Forgot Passwordl", message);
 
     const info = await transporter.sendMail(mailOption);
-    console.log(info.response);
+    // console.log(info.response);
 
     await findUser.save();
 
@@ -334,6 +334,79 @@ const deleteImage = AsyncHandler(async (req, res) => {
   }
 });
 
+const contactMe = AsyncHandler(async (req, res) => {
+  try {
+    const {
+      name,
+      eventName,
+      email,
+      companyName,
+      date,
+      location,
+      type,
+      expectedGuests,
+      description,
+    } = req.body;
+
+    if (
+      !name ||
+      !eventName ||
+      !email ||
+      !companyName ||
+      !date ||
+      !location ||
+      !type ||
+      !expectedGuests ||
+      !description
+    ) {
+      res.status(400);
+      throw new Error("Please provide all fields");
+    }
+    let info;
+    let myDate = new Date(date);
+    myDate = myDate.toUTCString().replace("00:00:00 GMT", "").trim();
+
+    // send contact request to tobi-peter mail
+
+    res.render(
+      "contact",
+      {
+        name,
+        eventName,
+        email,
+        companyName,
+        myDate,
+        location,
+        type,
+        expectedGuests,
+        description,
+      },
+      async (err, html) => {
+        if (err) {
+          console.log(err);
+          return;
+        } else {
+          let mailOption = {
+            from: email,
+            to: "tobipetermanagement@gmail.com",
+            subject: `DJ Request - ${eventName}`,
+            generateTextFromHtml: true,
+            html,
+          };
+          info = await transporter.sendMail(mailOption);
+        }
+        return res.status(200).json({
+          status: "success",
+          message: "email sent",
+          response: info.response,
+        });
+      }
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   registerAuth,
   loginAuth,
@@ -345,4 +418,5 @@ module.exports = {
   getAlbum,
   deleteImage,
   // sendNewsletter
+  contactMe,
 };

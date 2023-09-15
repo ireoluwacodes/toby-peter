@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerAuth, loginAuth, forgotPassword, changePassword, sendNewsletter, refresh, logoutAuth, uploadUserAlbum, getAlbum, deleteImage } = require("../controllers/authController");
+const { registerAuth, loginAuth, forgotPassword, changePassword, sendNewsletter, refresh, logoutAuth, uploadUserAlbum, getAlbum, deleteImage, contactMe } = require("../controllers/authController");
 const {authMiddleware, isAdmin} = require("../middlewares/authMiddleware");
 const { uploadPhoto } = require("../middlewares/uploadImage");
 
@@ -16,6 +16,8 @@ userRouter.route("/forgot-pass").post(forgotPassword)
 userRouter.route("/change-pass").put(authMiddleware, isAdmin, changePassword)
 
 userRouter.route("/logout").get(logoutAuth)
+
+userRouter.route("/contact").post(contactMe)
 
 userRouter.route("/upload").post(authMiddleware, isAdmin, uploadPhoto.array("images", 20), uploadUserAlbum)
 
