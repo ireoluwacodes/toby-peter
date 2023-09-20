@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 require("dotenv").config();
 
-export const app = express();
+const app = express();
 
 const { notFound } = require("./middlewares/notFound");
 const { errHandler } = require("./middlewares/errHandler");
@@ -59,3 +59,5 @@ const startApp = async () => {
 };
 
 startApp();
+
+module.exports = app
