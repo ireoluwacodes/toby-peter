@@ -15,12 +15,16 @@ const { showRouter } = require("./routes/showRoute");
 const { songRouter } = require("./routes/songRoute");
 const { blogRouter } = require("./routes/blogRoute");
 
-app.set("view engine", "ejs")
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["https://www.tobipeter.com"],
+    origin: [
+      "*",
+      "https://www.tobipeter.com",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+    ],
     methods: ["POST, GET, PUT, PATCH, DELETE"],
     credentials: true,
   })
@@ -60,4 +64,4 @@ const startApp = async () => {
 
 startApp();
 
-module.exports = app
+module.exports = app;

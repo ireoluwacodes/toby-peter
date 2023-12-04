@@ -1,0 +1,50 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      *{ margin:0; padding:0; box-sizing: border-box; } .wrapper{ width: 100%;
+      padding: 1.5rem; }
+    </style>
+  </head>
+  <body style="margin: 0; padding:0; box-sizing:border-box">
+    <div class="wrapper">
+      <h3 style="margin-bottom: 1.3rem;">HI TOBI!</h3>
+      <p style="margin-bottom: 1.3rem;">
+        I hope this message finds you well. We have an event coming up and we
+        are in search of a talented and experienced DJ to make our event truly
+        unforgettable. After researching various DJs, your exceptional skills
+        and reputation caught our attention and we believe you would be the
+        perfect fit for our event.
+      </p>
+      <h3 style="margin-bottom: 0.9rem;">EVENT DETAILS:</h3>
+      <ul style="margin-bottom: 1.3rem;">
+        <li><span style="font-weight: 600; font-size:0.85rem;">EVENT NAME:</span>
+          {{eventName}}.</li>
+        <li><span
+            style="font-weight: 600; font-size:0.85rem;"
+          >DESCRIPTION:</span>
+          {{description}}.</li>
+        <li><span style="font-weight: 600; font-size:0.85rem;">TYPE:</span>
+          {{type}}.</li>
+        <li><span style="font-weight: 600; font-size:0.85rem;">DATE:</span>
+          {{myDate}}.</li>
+        <li><span style="font-weight: 600; font-size:0.85rem;">VENUE:</span>
+          {{location}}.</li>
+        <li><span style="font-weight: 600; font-size:0.85rem;">EXPECTED GUESTS:</span>
+          {{expectedGuests}}.</li>
+      </ul>
+      <p style="margin-bottom: 1.3rem">
+        If you are available on
+        {{myDate}}
+        and interested in being part of our event, please let us know your
+        availability and pricing.
+      </p>
+      <p style="margin-bottom: 0.9rem;">Warm regards,</p>
+
+      <h4>NAME: {{name}}</h4>
+      <h4>COMPANY's NAME: {{companyName}}</h4>
+      <h4>EMAIL: {{email}}</h4>
+    </div>
+  </body>
+</html>

@@ -1,24 +1,59 @@
-const nodemailer = require("nodemailer");
+const transporter = require("../config/mailConfig");
 
-let transporter = nodemailer.createTransport({
-  host : process.env.MAIL_HOST,
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.USER,
-    pass: process.env.PASS,
-  },
-});
-
-const mailOptions = (email, subject, message) => {
-  let mailOption = {
-    from: process.env.USER,
-    to: email,
-    subject: subject,
-    text: "message",
-    html: message,
-  };
-  return mailOption;
+const sendContactMail = async (
+  subject,
+  template,
+  name,
+  eventName,
+  email,
+  companyName,
+  myDate,
+  location,
+  type,
+  expectedGuests,
+  description
+) => {
+  try {
+    let mailOption = {
+      from: email,
+      to: "tobipetermanagement@gmail.com",
+      subject,
+      template,
+      context: {
+        name,
+        eventName,
+        email,
+        companyName,
+        myDate,
+        location,
+        type,
+        expectedGuests,
+        description,
+      },
+    };
+    let info = await transporter.sendMail(mailOption);
+    return info;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
-module.exports = { transporter, mailOptions };
+const sendForgotMail = async (email, subject, message) => {
+  try {
+    let mailOption = {
+      from: process.env.USER,
+      to: email,
+      subject,
+      html: message,
+    };
+    let info = await transporter.sendMail(mailOption);
+    return info;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+module.exports = {
+  sendContactMail,
+  sendForgotMail,
+};
