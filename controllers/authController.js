@@ -381,36 +381,7 @@ const contactMe = AsyncHandler(async (req, res) => {
       expectedGuests,
       description
     );
-    // res.render(
-    //   "contact",
-    //   {
-    //     name,
-    //     eventName,
-    //     email,
-    //     companyName,
-    //     myDate,
-    //     location,
-    //     type,
-    //     expectedGuests,
-    //     description,
-    //   },
-    //   async (err, html) => {
-    //     if (err) {
-    //       console.log(err);
-    //       return;
-    //     } else {
-    //       let mailOption = {
-    //         from: email,
-    //         to: "tobipetermanagement@gmail.com",
-    //         subject: `DJ Request - ${eventName}`,
-    //         generateTextFromHtml: true,
-    //         html,
-    //       };
-    //       info = await transporter.sendMail(mailOption);
-    //     }
-
-    //   }
-    // );
+    
     return res.status(200).json({
       status: "success",
       message: "email sent",
